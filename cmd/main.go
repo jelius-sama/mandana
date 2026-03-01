@@ -1,10 +1,12 @@
 package main
 
+import "C"
 import (
     "context"
     "fmt"
     "mandana/api"
     "mandana/api/middleware"
+    "mandana/constants"
     "net/http"
     "os"
     "os/signal"
@@ -83,6 +85,7 @@ func init() {
 }
 
 func main() {
+    fmt.Println("\n\033[0;36m"+constants.AppName().Japanese, "version", constants.Version, "\033[0m")
     logger.Info("Starting server on port", PORT)
 
     var quit chan os.Signal = make(chan os.Signal, 1)

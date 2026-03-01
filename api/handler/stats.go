@@ -39,6 +39,7 @@ static int get_mem(uint64_t *vsize, uint64_t *rss) {
 import "C"
 import (
     "encoding/json"
+    "mandana/constants"
     "net/http"
     "os"
     "runtime"
@@ -60,6 +61,7 @@ type Stats struct {
     NumCPU       int     `json:"num_cpu"`
     UptimeSec    float64 `json:"uptime_sec"`
     Platform     string  `json:"platform"`
+    Version      string  `json:"version"`
 }
 
 var (
@@ -187,6 +189,7 @@ func HandleStats(w http.ResponseWriter, r *http.Request) {
         NumCPU:       runtime.NumCPU(),
         UptimeSec:    time.Since(t).Seconds(),
         Platform:     runtime.GOOS,
+        Version:      constants.Version,
     }); err != nil {
         HttpError(w, err, http.StatusInternalServerError)
     }

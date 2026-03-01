@@ -173,7 +173,7 @@ func HandleStats(w http.ResponseWriter, r *http.Request) {
 
     var t, err = time.Parse(os.Getenv("UPTIME"), os.Getenv("UPTIME"))
     if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
+        HttpError(w, err, http.StatusInternalServerError)
     }
 
     if err := json.NewEncoder(w).Encode(Stats{
@@ -188,7 +188,7 @@ func HandleStats(w http.ResponseWriter, r *http.Request) {
         UptimeSec:    time.Since(t).Seconds(),
         Platform:     runtime.GOOS,
     }); err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
+        HttpError(w, err, http.StatusInternalServerError)
     }
 }
 

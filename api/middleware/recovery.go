@@ -20,7 +20,7 @@ func RecoveryMiddleware(next http.Handler) http.Handler {
                 )
                 w.Header().Set("Content-Type", "application/json")
                 w.WriteHeader(http.StatusInternalServerError)
-                w.Write([]byte(`{"status":"500", "message": "Internal Server Error"}`))
+                w.Write([]byte(`{"code":"500", "error": "Internal Server Error"}`))
             }
         }()
         next.ServeHTTP(w, r)

@@ -40,26 +40,14 @@ func (hm HTTPMethod) String() string {
 
 // Generates and returns an absolute path
 func absPath(path string, method HTTPMethod) string {
-    return fmt.Sprintf(
-        "%s /api/%s/{$}",
-        method,
-        func() string {
-            var cleaned, _ = strings.CutPrefix(path, "/")
-            return cleaned
-        }(),
-    )
+    var cleaned, _ = strings.CutPrefix(path, "/")
+    return fmt.Sprintf("%s /api/%s/{$}", method, cleaned)
 }
 
 // Generates and returns a generic path
 func genPath(path string, method HTTPMethod) string {
-    return fmt.Sprintf(
-        "%s /api/%s/",
-        method,
-        func() string {
-            var cleaned, _ = strings.CutPrefix(path, "/")
-            return cleaned
-        }(),
-    )
+    var cleaned, _ = strings.CutPrefix(path, "/")
+    return fmt.Sprintf("%s /api/%s/", method, cleaned)
 }
 
 func Router() *http.ServeMux {

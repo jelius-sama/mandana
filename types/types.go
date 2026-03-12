@@ -1,10 +1,10 @@
 package types
 
 import (
+    "mandana/db"
     "time"
 
     "github.com/google/uuid"
-    "github.com/jelius-sama/logger"
 )
 
 // NOTE: For people wondering about use of `panic` in String() methods, read the middleware package, it already
@@ -44,12 +44,12 @@ type Sakuhin struct {
     // Tag is probably gonna be a new table with a foreign key to the row it represents, it contains a bunch of tags.
     Tags SakuhinTag `json:"tags"`
     // I'm not sure if category will come in any use but let's just keep it just in case to distinguish.
-    Category SakuhinCategory `json:"category"`
+    Category db.SakuhinCategory `json:"category"`
     // Demographic is the target audience base of a specific work. Can be nil in some cases.
-    Demographic   *SakuhinDemographic  `json:"demographic"`    // can be nil if unspecified demographic or multi-demographic
-    ContentRating SakuhinContentRating `json:"content_rating"` // self explanatory
-    Artist        []SakuhinCreator     `json:"artist"`         // self explanatory
-    Author        []SakuhinCreator     `json:"author"`         // self explanatory
+    Demographic   *db.SakuhinDemographic  `json:"demographic"`    // can be nil if unspecified demographic or multi-demographic
+    ContentRating db.SakuhinContentRating `json:"content_rating"` // self explanatory
+    Artist        []SakuhinCreator        `json:"artist"`         // self explanatory
+    Author        []SakuhinCreator        `json:"author"`         // self explanatory
     // All the recognizable character in the work, this is probably also a new table with a foreign key to the row it
     // represents.
     Character SakuhinCharacter `json:"character"`
@@ -63,22 +63,22 @@ type Sakuhin struct {
     SeriesID uuid.UUID `json:"series_id"` // All installments/parts of a series share this same ID
     // IDs of the row that is prequel to this installment. Note that while the field/property says prequel, it is not
     // prequel in the sense of storyline/timeline but rather the release date instead.
-    PrequelID *[]uuid.UUID `json:"prequel_id"`
+    PrequelID *[]Sakuhin `json:"prequel_id"`
     // Same as previously defined field PrequelID just for Sequels and as mentioned previously, it is also based on
     // release date rather than the timeline of the series as there are certain series such as fate where it is hard to
     // say which specific installment is prequel and which installment is sequel due to it sheer amount of references to
     // different series and the sheer number of installments that it currently has.
-    SequelID *[]uuid.UUID `json:"sequel_id"`
+    SequelID *[]Sakuhin `json:"sequel_id"`
     // Parodies is almost certainly dedicated to doujin and is pretty self explanatory.
     Parodies  *[]SakuhinParodies `json:"parodies"`   // if nil then the series is an original series
     PageCount uint16             `json:"page_count"` // self explanatory
     // Seriel number of the installment release count starting from 1..n installments.
     InstallmentNumber uint32 `json:"installment_number"` // Is there any series with more than 4 billion installments?
     // This field was mostly for the frontend but I guess we can use it to see if the installment is a "special", "extra", etc.
-    DisplayLabel DisplayLabel `json:"display_label"`
-    ReleasedAt   time.Time    `json:"released_at"` // self explanatory
-    UploadedAt   time.Time    `json:"uploaded_at"` // self explanatory
-    UpdatedAt    time.Time    `json:"updated_at"`  // self explanatory
+    DisplayLabel db.DisplayLabel `json:"display_label"`
+    ReleasedAt   time.Time       `json:"released_at"` // self explanatory
+    UploadedAt   time.Time       `json:"uploaded_at"` // self explanatory
+    UpdatedAt    time.Time       `json:"updated_at"`  // self explanatory
 }
 
 // Modern language don't have unions so I'm just gonna enforce in the frontend that a title must be provided, either En or Jp.
@@ -102,73 +102,6 @@ type SakuhinCreator struct {
     Name StringWithLang `json:"name"`
 }
 
-type SakuhinCategory uint32
-type SakuhinDemographic uint32
-type SakuhinContentRating uint32
-
-const (
-    CategoryDoujin SakuhinCategory = iota
-    CategoryManga
-)
-
-const (
-    DemographicShounen SakuhinDemographic = iota
-    DemographicShoujo
-    DemographicSeinen
-    DemographicJosei
-)
-
-const (
-    RatingSafe       SakuhinContentRating = iota // SFW Work
-    RatingSuggestive                             // Not pornographic work but not SFW either
-    RatingErotica                                // Soft pornographic work (blured censorship, holy light censorship, etc.)
-    RatingNSFW                                   // Uncensored pornographic work
-)
-
-func (mc SakuhinCategory) String() string {
-    switch mc {
-    case CategoryDoujin:
-        return "Doujin"
-    case CategoryManga:
-        return "Manga"
-    }
-
-    logger.Panic("unreachable")
-    return ""
-}
-
-func (md SakuhinDemographic) String() string {
-    switch md {
-    case DemographicJosei:
-        return "Josei"
-    case DemographicSeinen:
-        return "Seinen"
-    case DemographicShoujo:
-        return "Shoujo"
-    case DemographicShounen:
-        return "Shounen"
-    }
-
-    logger.Panic("unreachable")
-    return ""
-}
-
-func (mcr SakuhinContentRating) String() string {
-    switch mcr {
-    case RatingErotica:
-        return "Erotica"
-    case RatingNSFW:
-        return "Hentai"
-    case RatingSafe:
-        return "Safe"
-    case RatingSuggestive:
-        return "Suggestive"
-    }
-
-    logger.Panic("unreachable")
-    return ""
-}
-
 // Separate table
 type SakuhinRepresentation struct {
     SeriesID     uuid.UUID `json:"series_id"`     // foreign key
@@ -187,46 +120,7 @@ type SakuhinRepresentation struct {
     } `json:"volumes"` // will be nil in cases where the work is not supposed to be counted as a "volume", example a single doujinshi vs a compilation of doujinshis.
 }
 
-type DisplayLabel uint8
-
-const (
-    LabelPart DisplayLabel = iota
-    LabelOneShot
-    LabelSpecial
-    LabelExtra
-    LabelSpinOff
-    LabelVolume  // If tankouban release schedule
-    LabelChapter // If individual chapters are released instead of more commonly used parts convention
-    LabelCour    // Rarely used in Manga/Doujin context, but let's keep it for edge cases
-    LabelUnknown
-)
-
-func (dl DisplayLabel) String() string {
-    switch dl {
-    case LabelCour:
-        return "Cour"
-    case LabelOneShot:
-        return "One Shot"
-    case LabelPart:
-        return "Part"
-    case LabelSpecial:
-        return "Special"
-    case LabelSpinOff:
-        return "Spin Off"
-    case LabelVolume:
-        return "Volume"
-    case LabelChapter:
-        return "Chapter"
-    case LabelExtra:
-        return "Extra"
-    case LabelUnknown:
-        return "Unknown"
-    }
-
-    logger.Panic("unreachable")
-    return ""
-}
-
+// FIXME: If ACharacter is gonna be a table then we probably can define their role in their row itself and don't need this structure.
 type SakuhinCharacter struct {
     Protagonists         []ACharacter `json:"protagonists"`
     SupportingCharacters []ACharacter `json:"supporting_characters"`
@@ -251,78 +145,10 @@ type SakuhinParodies struct {
 
 // Separate table
 type SakuhinPublicationStat struct {
-    SeriesID        uuid.UUID `json:"series_id"` // foreign key
-    InitialRelease  time.Time `json:"initial_release"`
-    LatestRelease   time.Time `json:"latest_release"`
-    CurrentStatus   Status    `json:"status"`
-    ReleaseSchedule Schedule  `json:"schedule"`
-}
-
-type Status uint32
-
-const (
-    StatusOngoing Status = iota
-    StatusFinished
-    StatusHiatus
-    StatusAbandoned
-    StatusUnknown
-)
-
-func (s Status) String() string {
-    switch s {
-    case StatusAbandoned:
-        return "Abandoned"
-    case StatusFinished:
-        return "Finished"
-    case StatusHiatus:
-        return "Hiatus"
-    case StatusOngoing:
-        return "Ongoing"
-    case StatusUnknown:
-        return "Unknown"
-    }
-
-    logger.Panic("unreachable")
-    return ""
-}
-
-type Schedule uint32
-
-const (
-    ScheduleWeekly Schedule = iota
-    ScheduleBiWeekly
-    ScheduleSemiWeekly
-    ScheduleMonthly
-    ScheduleBiMonthly
-    ScheduleSemiMonthly
-    ScheduleIrregular
-    ScheduleTankoubon
-    ScheduleOneShot
-)
-
-func (s Schedule) String() string {
-    switch s {
-    case ScheduleWeekly:
-        return "Weekly"
-    case ScheduleBiWeekly:
-        return "Bi-Weekly"
-    case ScheduleSemiWeekly:
-        return "Semi-Weekly"
-    case ScheduleSemiMonthly:
-        return "Semi-Monthly"
-    case ScheduleMonthly:
-        return "Monthly"
-    case ScheduleBiMonthly:
-        return "Bi-Monthly"
-    case ScheduleIrregular:
-        return "Irregular"
-    case ScheduleTankoubon:
-        return "Tankoubon"
-    case ScheduleOneShot:
-        return "OneShot"
-    }
-
-    logger.Panic("unreachable")
-    return ""
+    SeriesID        uuid.UUID   `json:"series_id"` // foreign key
+    InitialRelease  time.Time   `json:"initial_release"`
+    LatestRelease   time.Time   `json:"latest_release"`
+    CurrentStatus   db.Status   `json:"status"`
+    ReleaseSchedule db.Schedule `json:"schedule"`
 }
 

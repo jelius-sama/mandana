@@ -26,6 +26,10 @@ import (
 // the database, after it croses the DB package layer it is not gonna be uuid but rather the whole table which
 // would be in the struct type of that field, example include `Sakuhin.PrequelID`, `Sakuhin.SequelID`, etc.
 
+// NOTE: We need to define a property that will tell us how deep a recursive field goes or if it is nil.
+// Example: `Sakuhin.Prequel` contains `Sakuhin` in an array and if it goes on forever the data will get quite big
+// to transfer over the wire therefore we need pagination kind of feature to implement.
+
 // Sakuhin is designed with Manga and Doujin in mind, it can probably loosely represent other work such as LN too.
 type Sakuhin struct {
     // ID is primary key of a row that is used to uniquely identify it.
@@ -63,12 +67,12 @@ type Sakuhin struct {
     SeriesID uuid.UUID `json:"series_id"` // All installments/parts of a series share this same ID
     // IDs of the row that is prequel to this installment. Note that while the field/property says prequel, it is not
     // prequel in the sense of storyline/timeline but rather the release date instead.
-    PrequelID *[]Sakuhin `json:"prequel_id"`
+    Prequel *[]Sakuhin `json:"prequel_id"`
     // Same as previously defined field PrequelID just for Sequels and as mentioned previously, it is also based on
     // release date rather than the timeline of the series as there are certain series such as fate where it is hard to
     // say which specific installment is prequel and which installment is sequel due to it sheer amount of references to
     // different series and the sheer number of installments that it currently has.
-    SequelID *[]Sakuhin `json:"sequel_id"`
+    Sequel *[]Sakuhin `json:"sequel_id"`
     // Parodies is almost certainly dedicated to doujin and is pretty self explanatory.
     Parodies  *[]SakuhinParodies `json:"parodies"`   // if nil then the series is an original series
     PageCount uint16             `json:"page_count"` // self explanatory
@@ -79,6 +83,10 @@ type Sakuhin struct {
     ReleasedAt   time.Time       `json:"released_at"` // self explanatory
     UploadedAt   time.Time       `json:"uploaded_at"` // self explanatory
     UpdatedAt    time.Time       `json:"updated_at"`  // self explanatory
+
+    // The following is not available in the table as a singleton and we need to fetch using foreign key and merge them.
+    // The above instruction would be completed at the database layer so that we don't have to think about it.
+    Representation SakuhinRepresentation `json:"representation"`
 }
 
 // Modern language don't have unions so I'm just gonna enforce in the frontend that a title must be provided, either En or Jp.
@@ -104,8 +112,7 @@ type SakuhinCreator struct {
 
 // Separate table
 type SakuhinRepresentation struct {
-    SeriesID     uuid.UUID `json:"series_id"`     // foreign key
-    ChapterCount *uint64   `json:"chapter_count"` // will be nil in cases where we cannot count chapter such as in tankouban release, etc.
+    ChapterCount *uint64 `json:"chapter_count"` // will be nil in cases where we cannot count chapter such as in tankouban release, etc.
     Volumes      *[]struct {
         SerialNumber uint64 `json:"serial_number"`
         // one way to index volume is with start and end installment number

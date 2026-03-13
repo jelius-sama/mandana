@@ -1,0 +1,23 @@
+# Remove this taskfile dependency later and fully commit to `air` and `Makefile` instead.
+
+version: "3"
+
+vars:
+  TAILWIND_CMD:
+    sh: command -v tailwindcss >/dev/null 2>&1 && echo "tailwindcss" || echo "brew install tailwindcss"
+
+tasks:
+  templ:
+    desc: Run templ with hot reload
+    cmds:
+      - air
+
+  tailwind:
+    desc: Watch Tailwind CSS changes
+    cmds:
+      - "{{.TAILWIND_CMD}} -i ./client/css/tailwind.css -o ./client/assets/css/app.css --watch"
+
+  dev:
+    desc: Start development server with hot reload
+    cmds:
+      - task --parallel tailwind templ

@@ -2,14 +2,34 @@ package api
 
 import (
     "fmt"
+    "io/fs"
     "mandana/api/handler"
+    "mandana/client/assets"
+    "mandana/client/pages"
+    "mime"
     "net/http"
+    "os"
     "strings"
 
+    "github.com/a-h/templ"
     "github.com/jelius-sama/logger"
+    "github.com/templui/templui/utils"
 )
 
-type HTTPMethod int
+func init() {
+    // Force correct MIME types for web assets (handles some edge cases)
+    var jsMimeErr error = mime.AddExtensionType(".js", "application/javascript")
+    if jsMimeErr != nil {
+        logger.Error("Failed to set mime for js file types!")
+    }
+    var cssMimeErr error = mime.AddExtensionType(".css", "text/css")
+    if cssMimeErr != nil {
+        logger.Error("Failed to set mime for css file types!")
+    }
+}
+
+type RouteT uint8
+type HTTPMethod uint8
 
 const (
     MethodGET HTTPMethod = iota
@@ -17,6 +37,12 @@ const (
     MethodPATCH
     MethodPUT
     MethodDELETE
+)
+
+const (
+    RouteAPI RouteT = iota
+    RoutePage
+    RouteAsset
 )
 
 func (hm HTTPMethod) String() string {
@@ -38,25 +64,59 @@ func (hm HTTPMethod) String() string {
     return "GET"
 }
 
+func (rt RouteT) String() string {
+    switch rt {
+    case RouteAPI:
+        return "/api"
+    case RouteAsset:
+        return "/assets"
+    case RoutePage:
+        return ""
+    }
+    logger.Panic("Unreachable")
+    return ""
+}
+
 // Generates and returns an absolute path
-func absPath(path string, method HTTPMethod) string {
-    var cleaned, _ = strings.CutPrefix(path, "/")
-    return fmt.Sprintf("%s /api/%s/{$}", method, cleaned)
+func absPath(path string, method HTTPMethod, routeType RouteT) string {
+    path, _ = strings.CutPrefix(path, "/")
+    path, _ = strings.CutSuffix(path, "/")
+    if path != "" {
+        path = fmt.Sprintf("/%s", path)
+    }
+    return fmt.Sprintf("%s %s%s/{$}", method, routeType, path)
 }
 
 // Generates and returns a generic path
-func genPath(path string, method HTTPMethod) string {
-    var cleaned, _ = strings.CutPrefix(path, "/")
-    return fmt.Sprintf("%s /api/%s/", method, cleaned)
+func genPath(path string, method HTTPMethod, routeType RouteT) string {
+    path, _ = strings.CutPrefix(path, "/")
+    path, _ = strings.CutSuffix(path, "/")
+    if path != "" {
+        path = fmt.Sprintf("/%s", path)
+    }
+    return fmt.Sprintf("%s %s%s/", method, routeType, path)
 }
 
 func Router() *http.ServeMux {
     var mux *http.ServeMux = http.NewServeMux()
 
-    mux.HandleFunc(absPath("/get/all", MethodGET), handler.HTTPPlaceholder)
-    mux.HandleFunc(genPath("get", MethodGET), handler.HTTPPlaceholder)
+    mux.Handle(absPath("/", MethodGET, RoutePage), templ.Handler(pages.Home()))
 
-    mux.HandleFunc(absPath("stats", MethodGET), handler.HandleStats)
+    mux.HandleFunc(absPath("/get/all", MethodGET, RouteAPI), handler.HTTPPlaceholder)
+    mux.HandleFunc(genPath("get", MethodGET, RouteAPI), handler.HTTPPlaceholder)
+
+    mux.HandleFunc(absPath("stats", MethodGET, RouteAPI), handler.HandleStats)
+
+    mux.Handle(genPath("css", MethodGET, RouteAsset), http.StripPrefix("/assets/",
+        http.FileServer(http.FS(assets.Assets))))
+
+    mux.Handle(genPath("fonts", MethodGET, RouteAsset), http.StripPrefix("/assets/",
+        http.FileServer(http.FS(assets.Assets))))
+
+    mux.Handle(genPath("resource", MethodGET, RouteAsset), http.StripPrefix("/assets/",
+        http.FileServer(http.FS(assets.Assets))))
+
+    utils.SetupScriptRoutes(mux, os.Getenv("IS_PROD") == "FALSE")
 
     return mux
 }

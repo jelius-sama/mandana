@@ -1,0 +1,7 @@
+{
+  "componentsDir": "client/components",
+  "utilsDir": "client/utils",
+  "moduleName": "mandana",
+  "jsDir": "client/assets/js",
+  "jsPublicPath": "/client/assets/js"
+}

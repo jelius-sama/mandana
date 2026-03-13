@@ -1,4 +1,5 @@
 bin/
 build/
+*_templ.go
 
 .DS_Store

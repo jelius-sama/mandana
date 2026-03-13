@@ -2,7 +2,6 @@ package api
 
 import (
     "fmt"
-    "io/fs"
     "mandana/api/handler"
     "mandana/client/assets"
     "mandana/client/pages"
@@ -11,7 +10,6 @@ import (
     "os"
     "strings"
 
-    "github.com/a-h/templ"
     "github.com/jelius-sama/logger"
     "github.com/templui/templui/utils"
 )
@@ -100,7 +98,21 @@ func genPath(path string, method HTTPMethod, routeType RouteT) string {
 func Router() *http.ServeMux {
     var mux *http.ServeMux = http.NewServeMux()
 
-    mux.Handle(absPath("/", MethodGET, RoutePage), templ.Handler(pages.Home()))
+    mux.HandleFunc(absPath("/", MethodGET, RoutePage), func(w http.ResponseWriter, r *http.Request) {
+        handler.Page(handler.PageT{
+            W:    w,
+            R:    r,
+            Page: pages.Home(),
+        })
+    })
+
+    mux.HandleFunc(genPath("/", MethodGET, RoutePage), func(w http.ResponseWriter, r *http.Request) {
+        handler.Page(handler.PageT{
+            W:    w,
+            R:    r,
+            Page: pages.NotFound(),
+        })
+    })
 
     mux.HandleFunc(absPath("/get/all", MethodGET, RouteAPI), handler.HTTPPlaceholder)
     mux.HandleFunc(genPath("get", MethodGET, RouteAPI), handler.HTTPPlaceholder)
@@ -108,6 +120,9 @@ func Router() *http.ServeMux {
     mux.HandleFunc(absPath("stats", MethodGET, RouteAPI), handler.HandleStats)
 
     mux.Handle(genPath("css", MethodGET, RouteAsset), http.StripPrefix("/assets/",
+        http.FileServer(http.FS(assets.Assets))))
+
+    mux.Handle(genPath("js", MethodGET, RouteAsset), http.StripPrefix("/assets/",
         http.FileServer(http.FS(assets.Assets))))
 
     mux.Handle(genPath("fonts", MethodGET, RouteAsset), http.StripPrefix("/assets/",

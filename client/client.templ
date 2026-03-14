@@ -10,17 +10,45 @@ templ Layout() {
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<link rel="preload" href="/assets/fonts/geist/geist-variable.woff2" as="font" type="font/woff2" crossorigin="anonymous"/>
 			<link rel="preload" href="/assets/fonts/geist/geist-mono-variable.woff2" as="font" type="font/woff2" crossorigin="anonymous"/>
-			<title>templUI App</title>
+			<link rel="icon" href="/assets/resource/mandana.svg" type="image/svg+xml"/>
+			<title>Mandana</title>
 			<link href="/assets/css/app.css" rel="stylesheet"/>
 			<script src="/assets/js/htmx.min.js"></script>
+			<script src="/assets/js/theme.js" defer></script>
+			// TODO: Implement lazy loading
+			<script defer src="/assets/js/sidebar.min.js"></script>
+			<script defer src="/assets/js/dropdown.min.js"></script>
+			<script defer src="/assets/js/dialog.min.js"></script>
+			<script defer src="/assets/js/popover.min.js"></script>
+			<script defer src="/assets/js/avatar.min.js"></script>
+			<script defer src="/assets/js/collapsible.min.js"></script>
 		</head>
 		<body class="h-full" hx-boost="true" hx-target="#app-main" hx-push-url="true">
-			<div class="flex h-full flex-col">
-				@layout.Navbar()
-				<main class="flex-1" id="app-main">
+			@layout.AppSidebar() {
+				<main id="app-main">
 					{ children... }
 				</main>
-			</div>
+			}
+			<script>
+			function initActiveSidebarHighlight() {
+				document.querySelectorAll('aside a').forEach(a => {
+					a.classList.toggle('bg-accent', a.href === location.href);
+				});
+			}
+
+			// Active link updater
+			document.body.addEventListener('htmx:afterSettle', initActiveSidebarHighlight);
+			document.body.addEventListener('htmx:load', initActiveSidebarHighlight);
+
+			// Scroll to top after content swap
+			document.body.addEventListener('htmx:afterSwap', (e) => {
+				if (e.detail.target !== undefined) {
+					if (e.detail.target.id === 'app-main') {
+						e.detail.target.scrollTop = 0;
+					}
+				}
+			});
+			</script>
 		</body>
 	</html>
 }

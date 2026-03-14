@@ -5,18 +5,19 @@ import (
 	"mandana/client/components/icon"
 )
 
-// TODO: Work on how we should deal with JS re-initialization, JS Life-Cycle, and JS events/interactivity .
 templ Home() {
 	<div class="flex h-full items-center justify-center">
 		<div class="flex w-full max-w-2xl flex-col items-center justify-center gap-4 px-4">
-			<div class="space-y-4 text-center">
-				<h1 class="text-5xl font-bold tracking-tight">templUI Quickstart</h1>
-				<p class="text-muted-foreground mx-auto max-w-md text-lg">
-					Build modern web applications with
-					<br/>
-					Go, templ, and Tailwind CSS.
-				</p>
-			</div>
+			for range(10) {
+				<div class="space-y-4 text-center">
+					<h1 class="text-5xl font-bold tracking-tight">templUI Quickstart</h1>
+					<p class="text-muted-foreground mx-auto max-w-md text-lg">
+						Build modern web applications with
+						<br/>
+						Go, templ, and Tailwind CSS.
+					</p>
+				</div>
+			}
 			<div class="flex gap-3">
 				@button.Button(button.Props{
 					Variant: button.VariantOutline,

@@ -7,11 +7,9 @@ import (
     "mandana/client/pages"
     "mime"
     "net/http"
-    "os"
     "strings"
 
     "github.com/jelius-sama/logger"
-    "github.com/templui/templui/utils"
 )
 
 func init() {
@@ -131,7 +129,7 @@ func Router() *http.ServeMux {
     mux.Handle(genPath("resource", MethodGET, RouteAsset), http.StripPrefix("/assets/",
         http.FileServer(http.FS(assets.Assets))))
 
-    utils.SetupScriptRoutes(mux, os.Getenv("IS_PROD") == "FALSE")
+    // utils.SetupScriptRoutes(mux, os.Getenv("IS_PROD") == "FALSE")
 
     return mux
 }

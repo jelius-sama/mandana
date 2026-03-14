@@ -1,6 +1,7 @@
 // templui component icon - version: v1.7.1 installed by templui v1.7.1
 // 📚 Documentation: https://templui.io/docs/components/icon
 package icon
+
 // This file is auto generated
 // Using Lucide icons version 0.576.0
 var AArrowDown = Icon("a-arrow-down")
@@ -1705,3 +1706,4 @@ var ZodiacTaurus = Icon("zodiac-taurus")
 var ZodiacVirgo = Icon("zodiac-virgo")
 var ZoomIn = Icon("zoom-in")
 var ZoomOut = Icon("zoom-out")
+

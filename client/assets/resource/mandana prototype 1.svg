@@ -1,0 +1,19 @@
+<svg width="100%" viewBox="0 0 680 680" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Icon background: fills almost the full viewBox -->
+  <rect x="40" y="40" width="600" height="600" rx="132" fill="#111110" style="fill:rgb(17, 17, 16);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- Book shape centered at 340,340 -->
+  <!-- Top point: 340,160 — Bottom: 340,520 — Left/right extent: 40 to 640 -->
+  <!-- Left page -->
+  <polygon points="70,480 330,220 330,340 70,560" fill="#3a6a28" style="fill:rgb(58, 106, 40);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <!-- Right page -->
+  <polygon points="350,220 610,480 610,560 350,340" fill="#5ab83a" style="fill:rgb(90, 184, 58);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <!-- Center spine -->
+  <line x1="340" y1="215" x2="340" y2="562" stroke="#111110" stroke-width="10" stroke-linecap="round" style="fill:rgb(0, 0, 0);stroke:rgb(17, 17, 16);color:rgb(251, 251, 254);stroke-width:10px;stroke-linecap:round;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <line x1="340" y1="215" x2="340" y2="562" stroke="#7dd45a" stroke-width="2" stroke-linecap="round" opacity="0.7" style="fill:rgb(0, 0, 0);stroke:rgb(125, 212, 90);color:rgb(251, 251, 254);stroke-width:2px;stroke-linecap:round;stroke-linejoin:miter;opacity:0.7;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- Icon border -->
+  <rect x="40" y="40" width="600" height="600" rx="132" fill="none" stroke="#3a6a28" stroke-width="2" opacity="0.6" style="fill:none;stroke:rgb(58, 106, 40);color:rgb(251, 251, 254);stroke-width:2px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.6;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+</svg>

@@ -1,0 +1,200 @@
+package layout
+
+import (
+	"github.com/jelius-sama/logger"
+	"mandana/client/components/avatar"
+	"mandana/client/components/dropdown"
+	"mandana/client/components/icon"
+	"mandana/client/components/sidebar"
+)
+
+type Pages uint8
+
+const (
+	PageHome Pages = iota
+	PageFavorites
+	PageTags
+	PageSettings
+)
+
+func (pg Pages) Title() string {
+	switch pg {
+	case PageHome:
+		return "Home"
+	case PageFavorites:
+		return "Favorites"
+	case PageTags:
+		return "Tags"
+	case PageSettings:
+		return "Settings"
+	}
+
+	logger.Panic("Unreachable")
+	return ""
+}
+
+func (pg Pages) Href() string {
+	switch pg {
+	case PageHome:
+		return "/"
+	case PageFavorites:
+		return "/favorites"
+	case PageTags:
+		return "/tags"
+	case PageSettings:
+		return "/settings"
+	}
+
+	logger.Panic("Unreachable")
+	return ""
+}
+
+templ AppSidebar() {
+	@sidebar.Layout() {
+		@sidebar.Sidebar(sidebar.Props{
+			Collapsible: sidebar.CollapsibleIcon,
+			Variant:     sidebar.VariantFloating,
+		}) {
+			@sidebar.Header() {
+				@sidebar.Menu() {
+					@sidebar.MenuItem() {
+						@sidebar.MenuButton(sidebar.MenuButtonProps{
+							Class: "!bg-background",
+							Href:  PageHome.Href(),
+						}) {
+							<img alt="Mandana" src="/assets/resource/mandana.svg" class="size-8"/>
+							<span class="font-semibold">Mandana</span>
+						}
+					}
+				}
+			}
+			@sidebar.Content() {
+				@sidebar.Group() {
+					@sidebar.GroupLabel() {
+						Platform
+					}
+					@sidebar.Menu() {
+						@sidebar.MenuItem() {
+							@sidebar.MenuButton(sidebar.MenuButtonProps{
+								Href:    PageHome.Href(),
+								Tooltip: PageHome.Title(),
+							}) {
+								@icon.House(icon.Props{Class: "size-4"})
+								<span>{ PageHome.Title() }</span>
+							}
+						}
+						@sidebar.MenuItem() {
+							@sidebar.MenuButton(sidebar.MenuButtonProps{
+								Href:    PageFavorites.Href(),
+								Tooltip: PageFavorites.Title(),
+							}) {
+								@icon.HeartPlus(icon.Props{Class: "size-4"})
+								<span>{ PageFavorites.Title() }</span>
+								@sidebar.MenuBadge() {
+									3
+								}
+							}
+						}
+					}
+				}
+				@sidebar.Separator()
+				@sidebar.Group() {
+					@sidebar.GroupLabel() {
+						Browse
+					}
+					@sidebar.Menu() {
+						@sidebar.MenuItem() {
+							@sidebar.MenuButton(sidebar.MenuButtonProps{
+								Href:    PageTags.Href(),
+								Tooltip: PageTags.Title(),
+							}) {
+								@icon.Bookmark(icon.Props{Class: "size-4"})
+								<span>{ PageTags.Title() }</span>
+								@sidebar.MenuBadge() {
+									12
+								}
+							}
+						}
+					}
+				}
+				@sidebar.Separator()
+				@sidebar.Group() {
+					@sidebar.Menu() {
+						@sidebar.MenuItem() {
+							@sidebar.MenuButton(sidebar.MenuButtonProps{
+								Href:    PageSettings.Href(),
+								Tooltip: PageSettings.Title(),
+							}) {
+								@icon.Settings(icon.Props{Class: "size-4"})
+								<span>{ PageSettings.Title() }</span>
+							}
+						}
+					}
+				}
+			}
+			@sidebar.Footer() {
+				@sidebar.Menu() {
+					@sidebar.MenuItem() {
+						@dropdown.Dropdown() {
+							@dropdown.Trigger() {
+								@sidebar.MenuButton(sidebar.MenuButtonProps{
+									Size: sidebar.MenuButtonSizeLg,
+								}) {
+									@avatar.Avatar(avatar.Props{Class: "size-8 rounded-lg"}) {
+										@avatar.Image(avatar.ImageProps{
+											Src: "https://avatars.githubusercontent.com/u/26936893?v=4",
+										})
+									}
+									<div class="grid flex-1 text-left text-sm leading-tight">
+										<span class="truncate font-medium">John Doe</span>
+										<span class="truncate text-xs">john@example.com</span>
+									</div>
+									@icon.ChevronsUpDown(icon.Props{Class: "ml-auto size-4"})
+								}
+							}
+							@dropdown.Content(dropdown.ContentProps{
+								Class:     "w-56",
+								Placement: dropdown.PlacementTopStart,
+							}) {
+								@dropdown.Label() {
+									John Doe
+								}
+								@dropdown.Separator()
+								@dropdown.Item() {
+									<span class="flex items-center">
+										@icon.User(icon.Props{Class: "size-4 mr-2"})
+										Profile
+									</span>
+								}
+								@dropdown.Item() {
+									<span class="flex items-center">
+										@icon.Settings(icon.Props{Class: "size-4 mr-2"})
+										Settings
+									</span>
+								}
+								@dropdown.Separator()
+								@dropdown.Item() {
+									<span class="flex items-center">
+										@icon.LogOut(icon.Props{Class: "size-4 mr-2"})
+										Log out
+									</span>
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		@sidebar.Inset() {
+			<div class="flex h-full flex-col">
+				<div class="flex h-14 items-center gap-4 px-2">
+					@sidebar.Trigger()
+					<span class="text-sm sr-only text-muted-foreground">Press Ctrl+B to toggle sidebar</span>
+				</div>
+				<div class="p-6 pt-0 h-[calc(100vh-(var(--spacing)_*_14))] overflow-scroll">
+					{ children... }
+				</div>
+			</div>
+		}
+	}
+}

@@ -24,6 +24,7 @@ templ Layout() {
 			<script defer src="/assets/js/collapsible.min.js"></script>
 		</head>
 		<body class="h-full" hx-boost="true" hx-target="#app-main" hx-push-url="true">
+			// TODO: Optimize for mobile devices
 			@layout.AppSidebar() {
 				<main id="app-main">
 					{ children... }

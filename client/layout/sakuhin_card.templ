@@ -1,0 +1,82 @@
+package layout
+
+import (
+	"fmt"
+	"mandana/client/components/aspectratio"
+	"mandana/client/components/button"
+	"mandana/client/components/card"
+	"mandana/client/components/dropdown"
+	"mandana/client/components/icon"
+	"mandana/types"
+)
+
+templ SakuhinCard(sakuhin *types.Sakuhin) {
+	@card.Card(card.Props{
+		Class: "max-w-sm relative",
+	}) {
+		<div class="overflow-hidden w-full rounded-t-lg">
+			@aspectratio.AspectRatio(aspectratio.Props{
+				ID:    "top-media-aspect",
+				Ratio: aspectratio.RatioPortrait,
+				Class: "h-full w-full",
+			}) {
+				<a href={ fmt.Sprintf("/yomu/%s?page=1", sakuhin.ID) }>
+					<img
+						src={ sakuhin.CoverArts[0] }
+						alt="Card image"
+						loading="lazy"
+						class="h-full w-full object-cover"
+					/>
+				</a>
+			}
+		</div>
+		<a href={ fmt.Sprintf("/yomu/%s?page=1", sakuhin.ID) }>
+			@card.Header(card.HeaderProps{
+				Class: "p-2 pb-2",
+			}) {
+				@card.Title() {
+					// TODO: Handle null ptr deref and multi-lang support
+					{ *sakuhin.Title.English }
+				}
+				@card.Description() {
+					10 Pages
+				}
+			}
+		</a>
+		<div class="absolute bottom-2 right-2">
+			@dropdownMenu()
+		</div>
+	}
+}
+
+templ dropdownMenu() {
+	@dropdown.Dropdown() {
+		@dropdown.Trigger() {
+			@button.Button(button.Props{
+				Class:   "rounded-full",
+				Size:    button.SizeIcon,
+				Variant: button.VariantOutline,
+			}) {
+				@icon.EllipsisVertical(icon.Props{Class: "size-4"})
+			}
+		}
+		@dropdown.Content(dropdown.ContentProps{
+			Class: "w-56",
+		}) {
+			@dropdown.Group() {
+				@dropdown.Item() {
+					Add to Favorite
+					@dropdown.Shortcut() {
+						⇧+F
+					}
+				}
+				@dropdown.Item() {
+					Marked as Read
+					@dropdown.Shortcut() {
+						⇧+R
+					}
+				}
+			}
+		}
+	}
+}

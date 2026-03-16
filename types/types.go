@@ -44,7 +44,7 @@ type Sakuhin struct {
     // of the work. I will use an unique ID in a very specific directory where all the cover arts will be stored, this
     // way we can change the path to directory any time we want and use the ID to get the file within that specific
     // directory.
-    CoverArts *[]uuid.UUID `json:"cover_arts"`
+    CoverArts []string `json:"cover_arts"` // compute actual url from uuid in DB layer
     // Tag is probably gonna be a new table with a foreign key to the row it represents, it contains a bunch of tags.
     Tags SakuhinTag `json:"tags"`
     // I'm not sure if category will come in any use but let's just keep it just in case to distinguish.

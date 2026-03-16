@@ -5,10 +5,13 @@ import (
     "mandana/api/handler"
     "mandana/client/assets"
     "mandana/client/pages"
+    "mandana/types"
     "mime"
     "net/http"
+    "strconv"
     "strings"
 
+    "github.com/google/uuid"
     "github.com/jelius-sama/logger"
 )
 
@@ -84,13 +87,17 @@ func absPath(path string, method HTTPMethod, routeType RouteT) string {
 }
 
 // Generates and returns a generic path
-func genPath(path string, method HTTPMethod, routeType RouteT) string {
+func genPath(path string, method HTTPMethod, routeType RouteT, params ...string) string {
     path, _ = strings.CutPrefix(path, "/")
     path, _ = strings.CutSuffix(path, "/")
     if path != "" {
         path = fmt.Sprintf("/%s", path)
     }
-    return fmt.Sprintf("%s %s%s/", method, routeType, path)
+    if len(params) > 0 {
+        return fmt.Sprintf("%s %s%s/%s", method, routeType, path, strings.Join(params, ""))
+    } else {
+        return fmt.Sprintf("%s %s%s/", method, routeType, path)
+    }
 }
 
 func Router() *http.ServeMux {
@@ -104,6 +111,31 @@ func Router() *http.ServeMux {
         })
     })
 
+    mux.HandleFunc(genPath("yomu", MethodGET, RoutePage, "{id}"), func(w http.ResponseWriter, r *http.Request) {
+        var uuid, parseErr = uuid.Parse(r.PathValue("id"))
+
+        if parseErr != nil {
+            handler.Page(handler.PageT{
+                W:    w,
+                R:    r,
+                Page: pages.NotFound(),
+            })
+            return
+        }
+
+        pageStr := r.URL.Query().Get("page")
+        page, convertErr := strconv.Atoi(pageStr)
+        if page < 1 || convertErr != nil {
+            page = 1
+        }
+
+        handler.Page(handler.PageT{
+            W:    w,
+            R:    r,
+            Page: pages.Yomu(&types.Sakuhin{ID: uuid}, uint16(page)),
+        })
+    })
+
     mux.HandleFunc(genPath("/", MethodGET, RoutePage), func(w http.ResponseWriter, r *http.Request) {
         handler.Page(handler.PageT{
             W:    w,
@@ -112,8 +144,10 @@ func Router() *http.ServeMux {
         })
     })
 
-    mux.HandleFunc(absPath("/get/all", MethodGET, RouteAPI), handler.HTTPPlaceholder)
-    mux.HandleFunc(genPath("get", MethodGET, RouteAPI), handler.HTTPPlaceholder)
+    mux.HandleFunc(absPath("/sakuhin/all", MethodGET, RouteAPI), handler.HTTPPlaceholder)
+    mux.HandleFunc(genPath("sakuhin", MethodGET, RouteAPI), handler.HTTPPlaceholder)
+
+    mux.HandleFunc(genPath("panel", MethodGET, RouteAPI, "{id}"), handler.HandleGetPanel)
 
     mux.HandleFunc(absPath("stats", MethodGET, RouteAPI), handler.HandleStats)
 

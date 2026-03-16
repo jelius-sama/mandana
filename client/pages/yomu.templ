@@ -1,0 +1,13 @@
+package pages
+
+import (
+	"fmt"
+	"mandana/types"
+)
+
+templ Yomu(sakuhin *types.Sakuhin, defaultPage uint16) {
+	<section class="w-full h-full flex justify-center">
+		// TODO: Handle client side activities such as going forward or backward while reading and updating panel state
+		<img class="h-full object-contain" src={ fmt.Sprintf("/api/panel/%s?page=%d", sakuhin.ID, defaultPage) }/>
+	</section>
+}

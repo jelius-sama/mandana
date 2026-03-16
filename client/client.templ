@@ -26,7 +26,7 @@ templ Layout() {
 		<body class="h-full" hx-boost="true" hx-target="#app-main" hx-push-url="true">
 			// TODO: Optimize for mobile devices
 			@layout.AppSidebar() {
-				<main id="app-main">
+				<main class="w-full h-full" id="app-main">
 					{ children... }
 				</main>
 			}

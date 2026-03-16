@@ -123,7 +123,25 @@ func Router() *http.ServeMux {
             return
         }
 
+        var sakuhin *types.Sakuhin = &types.Sakuhin{
+            ID: uuid,
+            Title: types.StringWithLang{
+                English: logger.StringPtr("Placeholder Title"),
+            },
+            CoverArts: []string{"/assets/resource/placeholder.jpg"},
+            PageCount: 10,
+        }
+
         pageStr := r.URL.Query().Get("page")
+        if len(pageStr) == 0 {
+            handler.Page(handler.PageT{
+                W:    w,
+                R:    r,
+                Page: pages.Sakuhin(sakuhin),
+            })
+            return
+        }
+
         page, convertErr := strconv.Atoi(pageStr)
         if page < 1 || convertErr != nil {
             page = 1
@@ -132,7 +150,7 @@ func Router() *http.ServeMux {
         handler.Page(handler.PageT{
             W:    w,
             R:    r,
-            Page: pages.Yomu(&types.Sakuhin{ID: uuid}, uint16(page)),
+            Page: pages.Yomu(sakuhin, uint16(page)),
         })
     })
 

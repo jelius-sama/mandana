@@ -20,7 +20,7 @@ templ SakuhinCard(sakuhin *types.Sakuhin) {
 				Ratio: aspectratio.RatioPortrait,
 				Class: "h-full w-full",
 			}) {
-				<a href={ fmt.Sprintf("/yomu/%s?page=1", sakuhin.ID) }>
+				<a href={ fmt.Sprintf("/yomu/%s", sakuhin.ID) }>
 					<img
 						src={ sakuhin.CoverArts[0] }
 						alt="Card image"
@@ -30,11 +30,13 @@ templ SakuhinCard(sakuhin *types.Sakuhin) {
 				</a>
 			}
 		</div>
-		<a href={ fmt.Sprintf("/yomu/%s?page=1", sakuhin.ID) }>
+		<a href={ fmt.Sprintf("/yomu/%s", sakuhin.ID) }>
 			@card.Header(card.HeaderProps{
 				Class: "p-2 pb-2",
 			}) {
-				@card.Title() {
+				@card.Title(card.TitleProps{
+					Class: "text-sm sm:text-lg",
+				}) {
 					// TODO: Handle null ptr deref and multi-lang support
 					{ *sakuhin.Title.English }
 				}
@@ -53,11 +55,11 @@ templ dropdownMenu() {
 	@dropdown.Dropdown() {
 		@dropdown.Trigger() {
 			@button.Button(button.Props{
-				Class:   "rounded-full",
+				Class:   "rounded-full size-7 sm:size-9",
 				Size:    button.SizeIcon,
 				Variant: button.VariantOutline,
 			}) {
-				@icon.EllipsisVertical(icon.Props{Class: "size-4"})
+				@icon.EllipsisVertical(icon.Props{Class: "size-3.5 sm:size-4"})
 			}
 		}
 		@dropdown.Content(dropdown.ContentProps{

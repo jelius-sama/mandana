@@ -2,12 +2,39 @@ package pages
 
 import (
 	"fmt"
+	"mandana/client/components/button"
+	"mandana/client/components/icon"
 	"mandana/types"
 )
 
 templ Yomu(sakuhin *types.Sakuhin, defaultPage uint16) {
 	<section class="w-full h-full flex justify-center">
 		// TODO: Handle client side activities such as going forward or backward while reading and updating panel state
-		<img class="h-full object-contain" src={ fmt.Sprintf("/api/panel/%s?page=%d", sakuhin.ID, defaultPage) }/>
+		<div class="inline-flex flex-col items-stretch h-full">
+			<img id="yomu-panel-image" class="h-[95%] md:h-[90%] object-contain" loading="eager" decoding="async" src={ fmt.Sprintf("/api/panel/%s?page=%d", sakuhin.ID, defaultPage) }/>
+			@footer(sakuhin, defaultPage)
+		</div>
 	</section>
+}
+
+templ footer(sakuhin *types.Sakuhin, curPage uint16) {
+	<div id="yomu-footer-parent" class="h-[5%] md:h-[10%] flex items-center justify-between w-full max-w-full">
+		@button.Button(button.Props{
+			Variant:  button.VariantOutline,
+			Disabled: curPage == 1,
+			Href:     fmt.Sprintf("/yomu/%s?page=%d", sakuhin.ID, curPage-1),
+			Size:     button.SizeIcon,
+		}) {
+			@icon.ChevronLeft(icon.Props{Class: "size-4"})
+		}
+		<p class="text-muted-foreground">{ curPage }/{ sakuhin.PageCount }</p>
+		@button.Button(button.Props{
+			Variant:  button.VariantOutline,
+			Size:     button.SizeIcon,
+			Disabled: curPage == sakuhin.PageCount,
+			Href:     fmt.Sprintf("/yomu/%s?page=%d", sakuhin.ID, curPage+1),
+		}) {
+			@icon.ChevronRight(icon.Props{Class: "size-4"})
+		}
+	</div>
 }
